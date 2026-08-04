@@ -16,10 +16,10 @@ public class HelloController {
 		return new Mensagem ("Olá!");
 	}
 	
-	@PostMapping("/pets")
+	/*@PostMapping("/pets")
 	public PetDTO criarPet(@RequestBody PetDTO pet) {
 				
 		return pet;
-	}
+	}*/
 	
 }
