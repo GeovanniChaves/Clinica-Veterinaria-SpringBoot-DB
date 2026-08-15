@@ -2,107 +2,106 @@
 
 API REST desenvolvida para gerenciamento de uma clínica veterinária.
 
-O projeto foi desenvolvido utilizando Java com Spring Boot, aplicando conceitos de desenvolvimento backend, criação de APIs REST, persistência de dados com JPA/Hibernate e banco de dados relacional PostgreSQL.
+O projeto foi desenvolvido utilizando **Java 21 e Spring Boot**, aplicando conceitos de desenvolvimento backend, criação de APIs REST, persistência de dados com **JPA/Hibernate** e banco de dados relacional **PostgreSQL**.
 
 ---
 
-# 🚀 Tecnologias utilizadas
+## 🚀 Tecnologias utilizadas
 
-- Java 21
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- Hibernate
-- PostgreSQL
-- Maven
-- Postman
-- Swagger/OpenAPI
+* Java 21
+* Spring Boot
+* Spring Web
+* Spring Data JPA
+* Hibernate
+* PostgreSQL
+* Maven
+* Postman
 
 ---
 
-# 📌 Funcionalidades
+## 📌 Funcionalidades
 
-## 👤 Tutor
+### 👤 Tutor
 
 Gerenciamento dos tutores dos animais.
 
-Funcionalidades:
+**Funcionalidades:**
 
-- Cadastro de tutores
-- Listagem de tutores
-- Busca de tutor por ID
-- Atualização de dados
-- Exclusão de tutores
+* Cadastro de tutores
+* Listagem de tutores
+* Busca de tutor por ID
+* Atualização de dados
+* Exclusão de tutores
 
-Endpoints:
+**Endpoints:**
 
-
-POST /tutores
-GET /tutores
-GET /tutores/{id}
-PUT /tutores/{id}
+```text
+POST   /tutores
+GET    /tutores
+GET    /tutores/{id}
+PUT    /tutores/{id}
 DELETE /tutores/{id}
-
+```
 
 ---
 
-## 🩺 Veterinário
+### 🩺 Veterinário
 
 Gerenciamento dos profissionais da clínica.
 
-Funcionalidades:
+**Funcionalidades:**
 
-- Cadastro de veterinários
-- Listagem de veterinários
-- Busca por ID
-- Atualização de dados
-- Exclusão de veterinários
+* Cadastro de veterinários
+* Listagem de veterinários
+* Busca por ID
+* Atualização de dados
+* Exclusão de veterinários
 
-Endpoints:
+**Endpoints:**
 
-
-POST /veterinarios
-GET /veterinarios
-GET /veterinarios/{id}
-PUT /veterinarios/{id}
+```text
+POST   /veterinarios
+GET    /veterinarios
+GET    /veterinarios/{id}
+PUT    /veterinarios/{id}
 DELETE /veterinarios/{id}
-
+```
 
 ---
 
-## 🐕 Pet
+### 🐕 Pet
 
 Gerenciamento dos animais cadastrados.
 
 Cada pet possui um tutor responsável.
 
-Relacionamento:
+**Relacionamento:**
 
-
+```text
 Tutor 1 -------- N Pets
+```
 
+**Funcionalidades:**
 
-Funcionalidades:
+* Cadastro de pets
+* Listagem de pets
+* Busca de pet por ID
+* Atualização de dados
+* Exclusão de pets
 
-- Cadastro de pets
-- Listagem de pets
-- Busca por ID
-- Atualização de dados
-- Exclusão de pets
+**Endpoints:**
 
-Endpoints:
-
-
-POST /pets
-GET /pets
-GET /pets/{id}
-PUT /pets/{id}
+```text
+POST   /pets
+GET    /pets
+GET    /pets/{id}
+PUT    /pets/{id}
 DELETE /pets/{id}
+```
 
+**Exemplo de cadastro:**
 
-Exemplo de cadastro:
-
-json
+```json
 {
     "nome": "Rex",
     "especie": "Cachorro",
@@ -111,41 +110,50 @@ json
         "id": 1
     }
 }
-📅 Consulta
+```
+
+---
+
+### 📅 Consulta
 
 Gerenciamento das consultas realizadas na clínica.
 
 Uma consulta possui:
 
-Um pet
-Um veterinário
-Data
-Descrição
+* Pet
+* Veterinário
+* Data
+* Descrição
 
-Relacionamentos:
+**Relacionamentos:**
 
+```text
 Pet 1 -------- N Consultas
 
 Veterinário 1 -------- N Consultas
+```
 
-Funcionalidades:
+**Funcionalidades:**
 
-Cadastro de consultas
-Listagem de consultas
-Busca por ID
-Atualização
-Exclusão
+* Cadastro de consultas
+* Listagem de consultas
+* Busca de consulta por ID
+* Atualização de consultas
+* Exclusão de consultas
 
-Endpoints:
+**Endpoints:**
 
+```text
 POST   /consultas
 GET    /consultas
 GET    /consultas/{id}
 PUT    /consultas/{id}
 DELETE /consultas/{id}
+```
 
-Exemplo:
+**Exemplo de cadastro:**
 
+```json
 {
     "data": "2026-08-04",
     "descricao": "Consulta de rotina",
@@ -156,67 +164,93 @@ Exemplo:
         "id": 1
     }
 }
-🗄️ Banco de Dados
+```
 
-Banco utilizado:
+---
 
-PostgreSQL
+## 🗄️ Banco de Dados
 
-O gerenciamento das tabelas é realizado automaticamente pelo Hibernate através das entidades JPA.
+O projeto utiliza **PostgreSQL** como banco de dados relacional.
 
-Principais entidades:
+O gerenciamento das tabelas é realizado pelo **Hibernate**, utilizando as entidades JPA.
 
-Tutor
-Veterinario
-Pet
-Consulta
-🏗️ Arquitetura do projeto
+### Principais entidades
+
+* Tutor
+* Veterinário
+* Pet
+* Consulta
+
+---
+
+## 🏗️ Arquitetura do projeto
 
 O projeto segue uma organização baseada em camadas:
 
+```text
 src/main/java
-
+│
 ├── controller
 │   └── Responsável pelos endpoints da API
 │
 ├── model
-│   └── Entidades que representam as tabelas do banco
+│   └── Entidades que representam os dados do sistema
 │
 ├── repository
-│   └── Comunicação com o banco utilizando JPA
+│   └── Comunicação com o banco de dados utilizando JPA
 │
 └── dto
-    └── Objetos de transferência de dados
-🔗 Relacionamentos JPA
-Tutor e Pet
+    └── Objetos utilizados para transferência de dados
+```
+
+---
+
+## 🔗 Relacionamentos JPA
+
+### Tutor e Pet
 
 Um tutor pode possuir vários pets.
 
-Implementação:
-
+```java
 @ManyToOne
 private Tutor tutor;
-Pet e Consulta
+```
+
+### Pet e Consulta
 
 Um pet pode possuir várias consultas.
 
-Veterinário e Consulta
+### Veterinário e Consulta
 
 Um veterinário pode realizar várias consultas.
 
-▶️ Como executar o projeto
-Pré-requisitos
-Java 21 instalado
-PostgreSQL instalado
-Maven instalado
-Configuração do banco
+---
 
-Alterar o arquivo:
+## ▶️ Como executar o projeto
 
+### Pré-requisitos
+
+* Java 21 instalado
+* PostgreSQL instalado
+* Maven instalado
+
+### Configuração do banco
+
+Crie um banco de dados chamado:
+
+```text
+clinica_veterinaria
+```
+
+Depois, altere o arquivo:
+
+```text
 src/main/resources/application.properties
+```
 
 Exemplo:
 
+```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/clinica_veterinaria
 spring.datasource.username=postgres
 spring.datasource.password=SUA_SENHA
@@ -224,58 +258,68 @@ spring.datasource.password=SUA_SENHA
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
-Executar aplicação
+```
+
+### Executar a aplicação
 
 No terminal:
 
+```bash
 mvn spring-boot:run
+```
 
 A aplicação será iniciada em:
 
+```text
 http://localhost:8080
-📖 Documentação da API
+```
 
-A documentação dos endpoints está disponível utilizando Swagger/OpenAPI.
+---
 
-Após configurar o Swagger, acessar:
+## 🧪 Testes
 
-http://localhost:8080/swagger-ui/index.html
+Os endpoints da API foram testados utilizando **Postman**.
 
-O Swagger permite visualizar e testar todos os endpoints diretamente pelo navegador.
+Foram realizadas operações de:
 
-🧪 Testes
+* Criação de registros
+* Consulta de dados
+* Atualização
+* Exclusão
+* Validação dos relacionamentos entre as entidades
 
-Os endpoints foram testados utilizando:
+---
 
-Postman
+## 📚 Conceitos aplicados
 
-Operações realizadas:
+Durante o desenvolvimento foram utilizados conceitos de:
 
-Criação de registros
-Consulta de dados
-Atualização
-Exclusão
-Validação dos relacionamentos entre entidades
-📚 Conceitos aplicados
+* API REST
+* CRUD
+* Spring Boot
+* Injeção de dependência
+* Spring Data JPA
+* Hibernate ORM
+* Entidades JPA
+* Relacionamentos entre entidades
+* Persistência em banco de dados relacional
+* JSON
+* Métodos HTTP
+* Organização de projeto em camadas
+* Maven
 
-Durante o desenvolvimento foram utilizados:
+---
 
-API REST
-CRUD completo
-Spring Boot
-Injeção de dependência
-Spring Data JPA
-Hibernate ORM
-Entidades JPA
-Relacionamentos entre tabelas
-Persistência em banco relacional
-JSON
-HTTP Methods
+## 🎯 Objetivo do projeto
 
-👨‍💻 Autor
+Projeto desenvolvido com o objetivo de aplicar conhecimentos de **desenvolvimento backend utilizando Java e Spring Boot**, simulando uma aplicação real de gerenciamento de uma clínica veterinária.
 
-Geovanni Chaves
+O projeto também teve como objetivo praticar a integração entre uma API REST, banco de dados PostgreSQL e as tecnologias do ecossistema Spring.
 
-📌 Objetivo do projeto
+---
 
-Projeto desenvolvido com objetivo de aplicar conhecimentos de desenvolvimento backend utilizando Java e Spring Boot, simulando uma aplicação real de gerenciamento de uma clínica veterinária.
+## 👨‍💻 Autor
+
+**Geovanni Chaves**
+
+Desenvolvedor Java Backend Júnior
