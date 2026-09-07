@@ -1,39 +1,32 @@
 # 🐶 Clínica Veterinária API
 
-API REST desenvolvida para gerenciamento de uma clínica veterinária.
-
-O projeto foi desenvolvido utilizando **Java 21 e Spring Boot**, aplicando conceitos de desenvolvimento backend, criação de APIs REST, persistência de dados com **JPA/Hibernate** e banco de dados relacional **PostgreSQL**.
+API REST para gerenciamento de uma clínica veterinária.
+O projeto foi desenvolvido com **Java 21** e **Spring Boot**, cobrindo backend, API REST, persistência com **JPA/Hibernate** e **PostgreSQL**.
 
 ---
 
 ## 🚀 Tecnologias utilizadas
 
 * Java 21
-* Spring Boot
-* Spring Web
+* Spring Boot 4.1.0
+* Spring Web MVC
 * Spring Data JPA
 * Hibernate
 * PostgreSQL
 * Maven
-* Postman
+* Postman (testes manuais dos endpoints)
+
+Não há Swagger/OpenAPI, Spring Security nem camada `@Service` neste repositório.
 
 ---
 
 ## 📌 Funcionalidades
 
+CRUD HTTP nas quatro entidades. Os controllers recebem e devolvem a **entidade JPA em JSON** (não DTO).
+
 ### 👤 Tutor
 
-Gerenciamento dos tutores dos animais.
-
-**Funcionalidades:**
-
-* Cadastro de tutores
-* Listagem de tutores
-* Busca de tutor por ID
-* Atualização de dados
-* Exclusão de tutores
-
-**Endpoints:**
+* Cadastro, listagem, busca por ID, atualização e exclusão
 
 ```text
 POST   /tutores
@@ -43,21 +36,9 @@ PUT    /tutores/{id}
 DELETE /tutores/{id}
 ```
 
----
-
 ### 🩺 Veterinário
 
-Gerenciamento dos profissionais da clínica.
-
-**Funcionalidades:**
-
-* Cadastro de veterinários
-* Listagem de veterinários
-* Busca por ID
-* Atualização de dados
-* Exclusão de veterinários
-
-**Endpoints:**
+* Cadastro, listagem, busca por ID, atualização e exclusão
 
 ```text
 POST   /veterinarios
@@ -67,29 +48,9 @@ PUT    /veterinarios/{id}
 DELETE /veterinarios/{id}
 ```
 
----
-
 ### 🐕 Pet
 
-Gerenciamento dos animais cadastrados.
-
-Cada pet possui um tutor responsável.
-
-**Relacionamento:**
-
-```text
-Tutor 1 -------- N Pets
-```
-
-**Funcionalidades:**
-
-* Cadastro de pets
-* Listagem de pets
-* Busca de pet por ID
-* Atualização de dados
-* Exclusão de pets
-
-**Endpoints:**
+Cada pet referencia **um** tutor (`@ManyToOne`). No domínio: um tutor tem vários pets.
 
 ```text
 POST   /pets
@@ -99,7 +60,7 @@ PUT    /pets/{id}
 DELETE /pets/{id}
 ```
 
-**Exemplo de cadastro:**
+Exemplo de cadastro (o tutor `id` 1 precisa existir):
 
 ```json
 {
@@ -112,36 +73,9 @@ DELETE /pets/{id}
 }
 ```
 
----
-
 ### 📅 Consulta
 
-Gerenciamento das consultas realizadas na clínica.
-
-Uma consulta possui:
-
-* Pet
-* Veterinário
-* Data
-* Descrição
-
-**Relacionamentos:**
-
-```text
-Pet 1 -------- N Consultas
-
-Veterinário 1 -------- N Consultas
-```
-
-**Funcionalidades:**
-
-* Cadastro de consultas
-* Listagem de consultas
-* Busca de consulta por ID
-* Atualização de consultas
-* Exclusão de consultas
-
-**Endpoints:**
+Cada consulta referencia **um** pet e **um** veterinário (`@ManyToOne` nos dois). Data (`LocalDate`) e descrição.
 
 ```text
 POST   /consultas
@@ -151,7 +85,7 @@ PUT    /consultas/{id}
 DELETE /consultas/{id}
 ```
 
-**Exemplo de cadastro:**
+Exemplo (pet e veterinário precisam existir):
 
 ```json
 {
@@ -166,89 +100,62 @@ DELETE /consultas/{id}
 }
 ```
 
----
-
-## 🗄️ Banco de Dados
-
-O projeto utiliza **PostgreSQL** como banco de dados relacional.
-
-O gerenciamento das tabelas é realizado pelo **Hibernate**, utilizando as entidades JPA.
-
-### Principais entidades
-
-* Tutor
-* Veterinário
-* Pet
-* Consulta
+Ordem típica de uso: tutor e veterinário → pet → consulta. Na exclusão, o inverso (consultas antes do pet, pets antes do tutor), por causa das chaves estrangeiras.
 
 ---
 
-## 🏗️ Arquitetura do projeto
+## 🗄️ Banco de dados
 
-O projeto segue uma organização baseada em camadas:
+PostgreSQL. O banco `clinica_veterinaria` **é criado por você**. As **tabelas** são criadas/atualizadas pelo Hibernate (`spring.jpa.hibernate.ddl-auto=update`) a partir das entidades.
+
+Entidades / tabelas: `Tutor` (`tutores`), `Veterinario` (`veterinarios`), `Pet` (`pets`), `Consulta` (`consultas`).
+
+---
+
+## 🏗️ Organização do código
 
 ```text
-src/main/java
+src/main/java/.../clinicaveterinaria
 │
-├── controller
-│   └── Responsável pelos endpoints da API
-│
-├── model
-│   └── Entidades que representam os dados do sistema
-│
-├── repository
-│   └── Comunicação com o banco de dados utilizando JPA
-│
-└── dto
-    └── Objetos utilizados para transferência de dados
+├── controller   → endpoints REST (@RestController)
+├── model        → entidades JPA (@Entity)
+├── repository   → JpaRepository (save, findAll, findById, deleteById)
+└── dto          → PetDTO e Mensagem existem, mas nenhum endpoint usa essas classes
 ```
+
+Fluxo atual: **Controller → Repository** (injeção pelo construtor). Não há pasta `service`.
 
 ---
 
 ## 🔗 Relacionamentos JPA
 
-### Tutor e Pet
+Mapeamento **unidirecional** `@ManyToOne` (o lado que tem a FK). Não há `@OneToMany` nas classes.
 
-Um tutor pode possuir vários pets.
+### Pet → Tutor
 
 ```java
 @ManyToOne
 private Tutor tutor;
 ```
 
-### Pet e Consulta
+### Consulta → Pet e Veterinário
 
-Um pet pode possuir várias consultas.
+```java
+@ManyToOne
+private Pet pet;
 
-### Veterinário e Consulta
-
-Um veterinário pode realizar várias consultas.
+@ManyToOne
+private Veterinario veterinario;
+```
 
 ---
 
-## ▶️ Como executar o projeto
+## ▶️ Como executar
 
-### Pré-requisitos
+**Pré-requisitos:** Java 21, PostgreSQL, Maven.
 
-* Java 21 instalado
-* PostgreSQL instalado
-* Maven instalado
-
-### Configuração do banco
-
-Crie um banco de dados chamado:
-
-```text
-clinica_veterinaria
-```
-
-Depois, altere o arquivo:
-
-```text
-src/main/resources/application.properties
-```
-
-Exemplo:
+1. Crie o banco `clinica_veterinaria`.
+2. Ajuste `clinica-veterinaria/src/main/resources/application.properties` (usuário e senha).
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/clinica_veterinaria
@@ -260,66 +167,38 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 ```
 
-### Executar a aplicação
-
-No terminal:
+3. Na pasta `clinica-veterinaria`:
 
 ```bash
 mvn spring-boot:run
 ```
 
-A aplicação será iniciada em:
-
-```text
-http://localhost:8080
-```
+API em `http://localhost:8080`.
 
 ---
 
 ## 🧪 Testes
 
-Os endpoints da API foram testados utilizando **Postman**.
+* **Manuais:** Postman — POST/GET/PUT/DELETE e cadastro respeitando as FKs (tutor antes do pet, etc.).
+* **Automatizados:** apenas `ClinicaVeterinariaApplicationTests.contextLoads()` (sobe o contexto Spring). Não há testes de endpoint no repositório.
 
-Foram realizadas operações de:
-
-* Criação de registros
-* Consulta de dados
-* Atualização
-* Exclusão
-* Validação dos relacionamentos entre as entidades
+O starter de Bean Validation está no `pom.xml`, mas as entidades **não** usam `@NotBlank` / `@Valid`.
 
 ---
 
 ## 📚 Conceitos aplicados
 
-Durante o desenvolvimento foram utilizados conceitos de:
-
-* API REST
-* CRUD
-* Spring Boot
-* Injeção de dependência
-* Spring Data JPA
-* Hibernate ORM
-* Entidades JPA
-* Relacionamentos entre entidades
-* Persistência em banco de dados relacional
-* JSON
-* Métodos HTTP
-* Organização de projeto em camadas
-* Maven
+API REST, CRUD, métodos HTTP, JSON, Spring Boot, injeção de dependência, Spring Data JPA, Hibernate, entidades, `@ManyToOne`, PostgreSQL, Maven, organização por pacotes.
 
 ---
 
-## 🎯 Objetivo do projeto
+## 🎯 Objetivo
 
-Projeto desenvolvido com o objetivo de aplicar conhecimentos de **desenvolvimento backend utilizando Java e Spring Boot**, simulando uma aplicação real de gerenciamento de uma clínica veterinária.
-
-O projeto também teve como objetivo praticar a integração entre uma API REST, banco de dados PostgreSQL e as tecnologias do ecossistema Spring.
+Praticar backend Java/Spring Boot com uma API REST ligada ao PostgreSQL, no formato de um sistema de clínica veterinária.
 
 ---
 
 ## 👨‍💻 Autor
 
 **Geovanni Chaves**
-
 Desenvolvedor Java Backend Júnior
